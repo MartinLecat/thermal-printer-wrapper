@@ -34,5 +34,9 @@
         "check-format": "prettier --check .",
         "check-exports": "attw --pack . --ignore-rules=cjs-resolves-to-esm",
         "test": "vitest run"
+    },
+    "dependencies": {
+        "@types/lodash": "^4.17.7",
+        "lodash": "^4.17.21"
     }
 }
