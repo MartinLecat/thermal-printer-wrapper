@@ -1,2 +1,3 @@
 # thermal-printer-wrapper
-A wrapper foor my Thermal Printer (Epson TM-T88V)
+
+A wrapper tool my Thermal Printer (Epson TM-T88V)

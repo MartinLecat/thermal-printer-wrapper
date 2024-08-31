@@ -1,0 +1,11 @@
+{
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+        "*.ts": "$(capture).test.ts",
+        "tsconfig.json": "tsconfig.*.json",
+        "package.json": "package-lock.json, README.md, LICENSE, .gitignore"
+    },
+    "files.exclude": {
+        "node_modules": true
+    }
+}
