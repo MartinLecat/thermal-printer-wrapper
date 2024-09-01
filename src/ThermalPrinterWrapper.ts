@@ -3,6 +3,11 @@ import { encodeText } from "./CodePage/index.js";
 
 // MARK: Definitions
 /**
+ * Define the text size variant (small or normal)
+ * @see {@link https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_cm.html | Epson documentation} for more information
+ */
+export type TPWTextSize = "small" | "normal";
+/**
  * Define the underlining style
  *
  * - `0`: off
@@ -55,7 +60,7 @@ export class ThermalPrinterWrapper {
     private _cursor: number;
 
     public static DefaultOptions: TPWOptions = {
-        width: 80,
+        width: 42,
         defaultUnderlineStyle: 1,
         defaultStates: {
             align: "left",
@@ -135,10 +140,24 @@ export class ThermalPrinterWrapper {
      * Transfer queue to buffer, and close every state tags
      */
     private _flush() {
+        /* Close bold tag if opened */
+        if (this._states.bold) {
+            this.bold(false);
+        }
+        /* Close double strike tag if opened */
+        if (this._states.doubleStrike) {
+            this.doubleStrike(false);
+        }
+        /* Close invert tag if opened */
+        if (this._states.inverted) {
+            this.invert(false);
+        }
         /* Close underline tag if opened */
         if (this._states.underlined) {
             this.underline(0);
         }
+
+        this._buffer = this._queued;
     }
 
     // MARK: Publics
@@ -254,7 +273,7 @@ export class ThermalPrinterWrapper {
      * Toggle Invert
      *
      * @returns {this}
-     * @see {@link https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_cg.html | Epson documentation} for more information
+     * @see {@link https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/gs_cb.html | Epson documentation} for more information
      */
     public invert(): this;
     /**
@@ -262,7 +281,7 @@ export class ThermalPrinterWrapper {
      *
      * @param {string} text Text to underline
      * @returns {this}
-     * @see {@link https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_cg.html | Epson documentation} for more information
+     * @see {@link https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/gs_cb.html | Epson documentation} for more information
      */
     public invert(text: string): this;
     /**
@@ -270,28 +289,28 @@ export class ThermalPrinterWrapper {
      *
      * @param {boolean} type True to enable inverting, false to disable
      * @returns {this}
-     * @see {@link https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_cg.html | Epson documentation} for more information
+     * @see {@link https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/gs_cb.html | Epson documentation} for more information
      */
     public invert(type: boolean): this;
     public invert(a?: boolean | string): this {
         if (typeof a === "undefined") {
             /* If no arguments were given */
-            this._states.doubleStrike = !this._states.doubleStrike;
+            this._states.inverted = !this._states.inverted;
             /* Queue the Invert tag */
-            this._queue([0x1b, 0x42, this._states.doubleStrike ? 0x01 : 0x00]);
+            this._queue([0x1d, 0x42, this._states.inverted ? 0x01 : 0x00]);
         } else if (typeof a === "boolean") {
             /* If only one argument is being passed & it's a boolean */
-            this._states.doubleStrike = a;
-            this._queue([0x1b, 0x42, this._states.doubleStrike ? 0x01 : 0x00]);
+            this._states.inverted = a;
+            this._queue([0x1d, 0x42, this._states.inverted ? 0x01 : 0x00]);
         } else if (typeof a === "string") {
             /* If a string is passed as the first argument */
-            this._states.doubleStrike = !this._states.doubleStrike;
+            this._states.inverted = !this._states.inverted;
             /* Enable Invert with the given style, or the default one */
-            this._queue([0x1b, 0x42, 0x01]);
+            this._queue([0x1d, 0x42, 0x01]);
             /* Queue the text */
             this.text(a);
             /* Disable Invert */
-            this._queue([0x1b, 0x42, 0x00]);
+            this._queue([0x1d, 0x42, 0x00]);
         }
 
         return this;
@@ -371,6 +390,11 @@ export class ThermalPrinterWrapper {
         return this;
     }
 
+    public print(): this {
+        this._queue([0x1b, 0x64, 0x04]);
+        return this;
+    }
+
     /**
      * Encode a string, wrapped by the ticket's width
      *
@@ -393,7 +417,7 @@ export class ThermalPrinterWrapper {
                 this.newline();
             } else {
                 /* Else, save the cursor pos */
-                this._cursor += l.length;
+                this._cursor += l.length * this._states.charWidth;
             }
         }
 
@@ -408,8 +432,10 @@ export class ThermalPrinterWrapper {
      *
      * @returns {this}
      */
-    public newline(): this {
-        this._queue([0x0d, 0x0a]);
+    public newline(count: number = 1): this {
+        for (let i = 0; i < count; i++) {
+            this._queue([0x0d, 0x0a]);
+        }
         this._cursor = 0;
         return this;
     }
@@ -417,7 +443,7 @@ export class ThermalPrinterWrapper {
      * Encode the given text on a new line
      */
     public line(text: string): this {
-        if (this._cursor === 0) {
+        if (this._cursor !== 0) {
             /* If cursor is not at the beginning of the line, insert a newline */
             this.newline();
         }
@@ -430,6 +456,28 @@ export class ThermalPrinterWrapper {
     // #       Other definitions       #
     // #################################
     /**
+     * Initialize the printer
+     *
+     * @returns {this}
+     * @see {@link https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_atsign.html | Epson documentation} for more information
+     */
+    public initialize(): this {
+        this._queue([0x1b, 0x40]);
+        return this;
+    }
+
+    /**
+     * Queue raw values
+     *
+     * @param {number[]} values
+     * @returns {this}
+     */
+    public raw(values: number[]): this {
+        this._queue(values);
+        return this;
+    }
+
+    /**
      * Encode values in the buffer, ready to be sent to the printer
      *
      * @returns {Uint8Array}
@@ -440,6 +488,17 @@ export class ThermalPrinterWrapper {
 
         return result;
     }
+
+    /**
+     * Cut the paper
+     */
+    public cut(): this {
+        this.newline(5);
+        /* Cut command */
+        this._queue([0x1d, 0x56, 0x00]);
+        return this;
+    }
+
     /**
      * Define characters width
      *

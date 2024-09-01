@@ -11,11 +11,11 @@ A wrapper tool my Thermal Printer (Epson TM-T88V)
 - [x] [bold](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_ce.html)
 - [x] [double strike](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_cg.html)
 - [x] [invert](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/gs_cb.html)
-- [ ] [italic](https://github.com/NielsLeenheer/EscPosEncoder/blob/bce55458ef2b07a6ef3175ab7d4ffe3a16495ab5/src/esc-pos-encoder.js#L358)
 - [x] [underline](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_minus.html)
 - [ ] [upside-down](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_lbrace.html)
 - [x] [setCharWidth]()
 - [x] [setCharHeight]()
+- [ ] [text size variant](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_cm.html)
 - [ ] [90° rotation](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_cv.html)
 - [ ] [cut](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/gs_cv.html)
 - [ ] [get status](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/dle_eot.html)
@@ -26,6 +26,9 @@ A wrapper tool my Thermal Printer (Epson TM-T88V)
   - [ ] [width](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/gs_lw.html)
   - [ ] [print](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/gs_lk.html)
 - [ ] [test prints](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/gs_lparen_ca.html)
+
+# erh
+- [ ] [Exploration]
 
 # Unsure yet
 - [ ] [smooth~~~~](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/gs_lb.html)
