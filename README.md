@@ -3,6 +3,11 @@
 
 A wrapper tool my Thermal Printer (Epson TM-T88V)
 
+# IMPORTANT
+-> vérifier si l'imprimante wrap elle même le texte, si oui déplacer la fonction _wrap en utilitaire
+pour être utilisée par generateTable, et revoir le principe de cursor
+
+
 # Todo
 - [ ] [initializer](https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_atsign.html)
 - [x] newline

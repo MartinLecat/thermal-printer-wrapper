@@ -3,6 +3,17 @@ import { encodeText } from "./CodePage/index.js";
 
 // MARK: Definitions
 /**
+ * Options for a column in a printed table
+ */
+export interface TWPColOptions {
+    align?: "left" | "center" | "right";
+    verticalAlign?: "top" | "middle" | "bottom";
+}
+export interface TWPTableOptions {
+    outerBorder?: boolean;
+}
+export type TWPRow = (string | number | boolean)[];
+/**
  * Define the text size variant (small or normal)
  * @see {@link https://download4.epson.biz/sec_pubs/pos/reference_en/escpos/esc_cm.html | Epson documentation} for more information
  */
@@ -451,6 +462,11 @@ export class ThermalPrinterWrapper {
 
         return this;
     }
+
+    // #################################
+    // #       Table definitions       #
+    // #################################
+    public table(options: TWPColOptions[], values: TWPRow[]) {}
 
     // #################################
     // #       Other definitions       #
